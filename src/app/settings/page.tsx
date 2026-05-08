@@ -5,14 +5,14 @@ import { AppShell } from "@/components/layout/app-shell";
 import { useUiStore } from "@/store/ui-store";
 
 export default function SettingsPage() {
-  const { theme, toggleTheme, density, setDensity } = useUiStore();
+  const { theme, toggleTheme, density, setDensity, widgetSize, setWidgetSize, startPage, setStartPage } = useUiStore();
 
   return (
     <AppShell title="Settings">
       <div className="space-y-4">
         <section className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
           <h3 className="font-semibold">Display</h3>
-          <div className="mt-3 flex gap-3">
+          <div className="mt-3 flex flex-wrap gap-3">
             <button onClick={toggleTheme} className="rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700">
               Theme: {theme}
             </button>
@@ -23,6 +23,25 @@ export default function SettingsPage() {
             >
               <option value="comfortable">Comfortable</option>
               <option value="compact">Compact</option>
+            </select>
+
+            <select
+              value={startPage}
+              onChange={(event) => setStartPage(event.target.value as "/dashboard" | "/widget")}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
+            >
+              <option value="/dashboard">Start page: Dashboard</option>
+              <option value="/widget">Start page: Widget</option>
+            </select>
+
+            <select
+              value={widgetSize}
+              onChange={(event) => setWidgetSize(event.target.value as "s" | "m" | "l")}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
+            >
+              <option value="s">Widget size: Small</option>
+              <option value="m">Widget size: Medium</option>
+              <option value="l">Widget size: Large</option>
             </select>
           </div>
         </section>

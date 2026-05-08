@@ -1,12 +1,20 @@
 ﻿import type { ComponentType } from "react";
 import { AlertTriangle, CheckCircle2, CircleDashed, TimerReset } from "lucide-react";
 import { dashboardSummary, sprint } from "@/data/mock-data";
+import { cn } from "@/lib/utils";
 
-export function ScrumWidgetPanel() {
+export function ScrumWidgetPanel({ size = "m" }: { size?: "s" | "m" | "l" }) {
   const completion = Math.round((sprint.completedPoints / sprint.committedPoints) * 100);
 
   return (
-    <div className="w-full max-w-md rounded-3xl border border-slate-700/60 bg-slate-950/90 p-5 text-slate-100 shadow-2xl backdrop-blur">
+    <div
+      className={cn(
+        "w-full rounded-3xl border border-slate-700/60 bg-slate-950/90 text-slate-100 shadow-2xl backdrop-blur",
+        size === "s" && "max-w-xs p-3",
+        size === "m" && "max-w-md p-5",
+        size === "l" && "max-w-lg p-6",
+      )}
+    >
       <div className="mb-4 flex items-start justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Scrum Dashboard</p>
