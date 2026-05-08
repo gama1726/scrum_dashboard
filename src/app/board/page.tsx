@@ -10,13 +10,26 @@ export default async function BoardPage() {
 
   return (
     <AppShell title="Board">
-      <div className="mb-4 flex flex-wrap gap-2">
-        <input className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900" placeholder="Filter by assignee, priority or blocker" />
+      <div className="mb-4 flex gap-2">
+        <input
+          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
+          placeholder="Filter by assignee, priority or blocker"
+        />
       </div>
-      <div className="grid gap-4 lg:grid-cols-5">
+
+      <div className="overflow-x-auto pb-2">
+        <div className="flex min-w-max gap-4">
         {columns.map((status) => (
-          <section key={status} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-700 dark:bg-slate-900/40">
-            <h3 className="mb-3 text-sm font-semibold">{status}</h3>
+          <section
+            key={status}
+            className="w-[300px] shrink-0 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-700 dark:bg-slate-900/40"
+          >
+            <h3 className="mb-3 text-sm font-semibold">
+              {status}{" "}
+              <span className="text-xs font-normal text-slate-500">
+                ({tasks.filter((task) => task.status === status).length})
+              </span>
+            </h3>
             <div className="space-y-3">
               {tasks.filter((task) => task.status === status).map((task) => (
                 <TaskCard key={task.id} task={task} assignee={teamMembers.find((member) => member.id === task.assigneeId)} />
@@ -24,6 +37,7 @@ export default async function BoardPage() {
             </div>
           </section>
         ))}
+        </div>
       </div>
     </AppShell>
   );
