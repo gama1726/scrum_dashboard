@@ -14,24 +14,32 @@ interface BoardViewProps {
 }
 
 export function BoardView({ tasks, teamMembers }: BoardViewProps) {
+  const [boardTasks, setBoardTasks] = useState(tasks);
   const [query, setQuery] = useState("");
   const [assigneeId, setAssigneeId] = useState("all");
   const [priority, setPriority] = useState<"all" | TaskPriority>("all");
   const [blockedOnly, setBlockedOnly] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
+    return boardTasks.filter((task) => {
       const matchQuery = !query || task.title.toLowerCase().includes(query.toLowerCase()) || task.id.toLowerCase().includes(query.toLowerCase());
       const matchAssignee = assigneeId === "all" || task.assigneeId === assigneeId;
       const matchPriority = priority === "all" || task.priority === priority;
       const matchBlocked = !blockedOnly || task.blocked;
       return matchQuery && matchAssignee && matchPriority && matchBlocked;
     });
-  }, [tasks, query, assigneeId, priority, blockedOnly]);
+  }, [boardTasks, query, assigneeId, priority, blockedOnly]);
 
-  const selectedTask = tasks.find((task) => task.id === selectedTaskId) ?? null;
+  const selectedTask = boardTasks.find((task) => task.id === selectedTaskId) ?? null;
   const selectedAssignee = teamMembers.find((member) => member.id === selectedTask?.assigneeId);
+
+  const moveTaskToStatus = (taskId: string, status: TaskStatus) => {
+    setBoardTasks((currentTasks) =>
+      currentTasks.map((task) => (task.id === taskId ? { ...task, status } : task)),
+    );
+  };
 
   return (
     <>
@@ -80,7 +88,14 @@ export function BoardView({ tasks, teamMembers }: BoardViewProps) {
             return (
               <section
                 key={status}
-                className="w-[300px] shrink-0 rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50/95 to-slate-100/70 p-3 dark:border-slate-700 dark:from-slate-900/90 dark:to-slate-900/40"
+                className="w-[300px] shrink-0 rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50/95 to-slate-100/70 p-3 transition-colors dark:border-slate-700 dark:from-slate-900/90 dark:to-slate-900/40"
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => {
+                  if (draggingTaskId) {
+                    moveTaskToStatus(draggingTaskId, status);
+                    setDraggingTaskId(null);
+                  }
+                }}
               >
                 <h3 className="sticky top-0 z-10 mb-3 rounded-lg bg-white/90 px-2 py-1 text-sm font-semibold backdrop-blur dark:bg-slate-900/85">
                   {status} <span className="text-xs font-normal text-slate-500">({columnTasks.length})</span>
@@ -93,12 +108,18 @@ export function BoardView({ tasks, teamMembers }: BoardViewProps) {
                     </div>
                   ) : (
                     columnTasks.map((task) => (
-                      <TaskCard
+                      <div
                         key={task.id}
-                        task={task}
-                        assignee={teamMembers.find((member) => member.id === task.assigneeId)}
-                        onClick={() => setSelectedTaskId(task.id)}
-                      />
+                        draggable
+                        onDragStart={() => setDraggingTaskId(task.id)}
+                        onDragEnd={() => setDraggingTaskId(null)}
+                      >
+                        <TaskCard
+                          task={task}
+                          assignee={teamMembers.find((member) => member.id === task.assigneeId)}
+                          onClick={() => setSelectedTaskId(task.id)}
+                        />
+                      </div>
                     ))
                   )}
                 </div>
