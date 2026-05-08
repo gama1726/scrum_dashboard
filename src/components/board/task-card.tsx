@@ -5,12 +5,21 @@ import { motion } from "framer-motion";
 import { Task, TeamMember } from "@/types";
 import { PriorityBadge, StatusBadge } from "@/components/shared/badges";
 
-export function TaskCard({ task, assignee }: { task: Task; assignee?: TeamMember }) {
+export function TaskCard({
+  task,
+  assignee,
+  onClick,
+}: {
+  task: Task;
+  assignee?: TeamMember;
+  onClick?: () => void;
+}) {
   return (
     <motion.article
       whileHover={{ y: -2 }}
       transition={{ duration: 0.16, ease: "easeOut" }}
-      className="rounded-xl border border-slate-200/80 bg-white/95 p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
+      className="cursor-pointer rounded-xl border border-slate-200/80 bg-white/95 p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
+      onClick={onClick}
     >
       <div className="flex items-start justify-between gap-2">
         <div>
