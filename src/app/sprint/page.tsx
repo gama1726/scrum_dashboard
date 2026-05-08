@@ -1,8 +1,7 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { BurndownChart } from "@/components/charts/burndown-chart";
-import { VelocityChart } from "@/components/charts/velocity-chart";
 import { KpiCard } from "@/components/shared/kpi-card";
 import { apiClient } from "@/lib/api-client";
+import { SprintCharts } from "@/components/charts/sprint-charts";
 
 export default async function SprintPage() {
   const { sprint, blockers, metrics, tasks } = await apiClient.getSprintData();
@@ -18,10 +17,7 @@ export default async function SprintPage() {
         <KpiCard label="Completed" value={sprint.completedPoints} tone="good" />
         <KpiCard label="Remaining" value={sprint.committedPoints - sprint.completedPoints} tone="warn" />
       </div>
-      <div className="mt-4 grid gap-4 xl:grid-cols-2">
-        <BurndownChart data={metrics.burndown} />
-        <VelocityChart data={metrics.velocity} />
-      </div>
+      <SprintCharts burndown={metrics.burndown} velocity={metrics.velocity} />
       <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 text-sm dark:border-slate-700 dark:bg-slate-900">
         <p><strong>Risks:</strong> {blockers.length} active blockers and {tasks.filter((task) => task.blocked).length} blocked tasks.</p>
         <p className="mt-2"><strong>Recommendation:</strong> Prioritize critical blocker resolution in next standup and reduce WIP for overloaded members.</p>

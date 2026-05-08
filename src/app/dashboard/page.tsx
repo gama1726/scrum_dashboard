@@ -1,11 +1,9 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { ActivityFeed, BlockersList } from "@/components/dashboard/panels";
 import { QuickActions } from "@/components/dashboard/quick-actions";
-import { BurndownChart } from "@/components/charts/burndown-chart";
-import { TeamWorkloadChart } from "@/components/charts/team-workload-chart";
-import { VelocityChart } from "@/components/charts/velocity-chart";
 import { KpiCard } from "@/components/shared/kpi-card";
 import { apiClient } from "@/lib/api-client";
+import { DashboardBurndownChart, DashboardMetricsCharts } from "@/components/charts/dashboard-charts";
 
 export default async function DashboardPage() {
   const data = await apiClient.getDashboardData();
@@ -32,13 +30,12 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-3">
-        <div className="xl:col-span-2"><BurndownChart data={data.metrics.burndown} /></div>
+        <div className="xl:col-span-2"><DashboardBurndownChart data={data.metrics.burndown} /></div>
         <QuickActions />
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-3">
-        <VelocityChart data={data.metrics.velocity} />
-        <TeamWorkloadChart data={workloadData} />
+        <DashboardMetricsCharts velocity={data.metrics.velocity} workload={workloadData} />
         <BlockersList blockers={data.blockers} members={data.teamMembers} />
       </div>
 
