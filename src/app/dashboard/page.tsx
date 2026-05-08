@@ -23,10 +23,10 @@ export default async function DashboardPage() {
       </section>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Total Tasks" value={data.dashboardSummary.totalTasks} trend="Across current sprint" />
-        <KpiCard label="Completed" value={data.dashboardSummary.completedTasks} trend="+4 this week" tone="good" />
-        <KpiCard label="In Progress" value={data.dashboardSummary.inProgressTasks} trend="Stable flow" />
-        <KpiCard label="Blocked" value={data.dashboardSummary.blockedTasks} trend="Needs immediate attention" tone="warn" />
+        <KpiCard label="Total Tasks" value={data.dashboardSummary.totalTasks} trend="Across current sprint" href="/board" />
+        <KpiCard label="Completed" value={data.dashboardSummary.completedTasks} trend="+4 this week" tone="good" href="/board?status=Done" />
+        <KpiCard label="In Progress" value={data.dashboardSummary.inProgressTasks} trend="Stable flow" href="/board?status=In%20Progress" />
+        <KpiCard label="Blocked" value={data.dashboardSummary.blockedTasks} trend="Needs immediate attention" tone="warn" href="/board?blocked=true" />
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-3">

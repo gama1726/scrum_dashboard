@@ -11,14 +11,38 @@ const columns: TaskStatus[] = ["Backlog", "To Do", "In Progress", "Review", "Don
 interface BoardViewProps {
   tasks: Task[];
   teamMembers: TeamMember[];
+  initialFilters?: {
+    q?: string;
+    blocked?: boolean;
+    priority?: string;
+    status?: string;
+  };
 }
 
-export function BoardView({ tasks, teamMembers }: BoardViewProps) {
+export function BoardView({ tasks, teamMembers, initialFilters }: BoardViewProps) {
+  const initialStatus = initialFilters?.status;
+  const initialPriority = initialFilters?.priority;
+  const initialBlocked = Boolean(initialFilters?.blocked);
+  const initialQuery = initialFilters?.q ?? "";
+
   const [boardTasks, setBoardTasks] = useState(tasks);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [assigneeId, setAssigneeId] = useState("all");
-  const [priority, setPriority] = useState<"all" | TaskPriority>("all");
-  const [blockedOnly, setBlockedOnly] = useState(false);
+  const [priority, setPriority] = useState<"all" | TaskPriority>(
+    initialPriority === "Low" || initialPriority === "Medium" || initialPriority === "High" || initialPriority === "Critical"
+      ? initialPriority
+      : "all",
+  );
+  const [statusFilter, setStatusFilter] = useState<"all" | TaskStatus>(
+    initialStatus === "Backlog" ||
+      initialStatus === "To Do" ||
+      initialStatus === "In Progress" ||
+      initialStatus === "Review" ||
+      initialStatus === "Done"
+      ? initialStatus
+      : "all",
+  );
+  const [blockedOnly, setBlockedOnly] = useState(initialBlocked);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
 
@@ -27,10 +51,11 @@ export function BoardView({ tasks, teamMembers }: BoardViewProps) {
       const matchQuery = !query || task.title.toLowerCase().includes(query.toLowerCase()) || task.id.toLowerCase().includes(query.toLowerCase());
       const matchAssignee = assigneeId === "all" || task.assigneeId === assigneeId;
       const matchPriority = priority === "all" || task.priority === priority;
+      const matchStatus = statusFilter === "all" || task.status === statusFilter;
       const matchBlocked = !blockedOnly || task.blocked;
-      return matchQuery && matchAssignee && matchPriority && matchBlocked;
+      return matchQuery && matchAssignee && matchPriority && matchStatus && matchBlocked;
     });
-  }, [boardTasks, query, assigneeId, priority, blockedOnly]);
+  }, [boardTasks, query, assigneeId, priority, statusFilter, blockedOnly]);
 
   const selectedTask = boardTasks.find((task) => task.id === selectedTaskId) ?? null;
   const selectedAssignee = teamMembers.find((member) => member.id === selectedTask?.assigneeId);
@@ -43,7 +68,7 @@ export function BoardView({ tasks, teamMembers }: BoardViewProps) {
 
   return (
     <>
-      <div className="mb-4 grid gap-2 md:grid-cols-4">
+      <div className="mb-4 grid gap-2 md:grid-cols-5">
         <input
           className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-indigo-400 dark:border-slate-700 dark:bg-slate-900"
           placeholder="Search by task title or id"
@@ -72,6 +97,19 @@ export function BoardView({ tasks, teamMembers }: BoardViewProps) {
           <option value="Medium">Medium</option>
           <option value="High">High</option>
           <option value="Critical">Critical</option>
+        </select>
+
+        <select
+          value={statusFilter}
+          onChange={(event) => setStatusFilter(event.target.value as "all" | TaskStatus)}
+          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-indigo-400 dark:border-slate-700 dark:bg-slate-900"
+        >
+          <option value="all">All statuses</option>
+          <option value="Backlog">Backlog</option>
+          <option value="To Do">To Do</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Review">Review</option>
+          <option value="Done">Done</option>
         </select>
 
         <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900">
